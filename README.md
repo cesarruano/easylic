@@ -1,18 +1,15 @@
 # easylic
-A simple way of licensing your C/C++ applications offline, using signed activation files.
+An intuitive approach to licensing your C/C++ applications offline using signed activation files.
 
-## Main features
-Define the set of requirements for your license 
-- Tied to machine UUID
-- Expiration time
-- Tied to a provided license id file
+## Main Features
+With easylic, you can define a customized set of licensing requirements. Choose from the following optional features to suit your needs:
+- Bind to a specific machine UUID (optional)
+- Set an expiration time for the license (optional)
+- Associate with a provided license ID file (optional)
 
-Generate the activation files. They will be cryptographically signed and information regarding the license will not be visible.
+Generate activation files which are cryptographically signed. The details related to the license will remain concealed.
 
-Verify given activation files. Decrypt and verify their signature from your deployed application.
+Verify the provided activation files. Decrypt them and authenticate their signature from within your deployed application.
 
 ## Usage
-Typically you would compile an activator application, to sign the data and put it all in an AES encrypted file.
-And you would then compile your application using the verification api.
-In the example under /test, both actions are done, an activation file is created and then validated.
-It is important to use the define EASYLIC_PRIVATE when compiling the activator, otherwise, all private key handling is removed from the compilation.
+You would typically compile an activator application to sign the data and encapsulate it in an AES encrypted file. Subsequently, compile your primary application using the verification API. In the example found under `/test`, both these operations are performed: an activation file is created and then verified. Ensure you use the `EASYLIC_PRIVATE` define when compiling the activator; if omitted, all private key handling will be excluded from the compilation.
