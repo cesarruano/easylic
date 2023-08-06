@@ -33,6 +33,8 @@
 #include "handy_crypto.hpp"
 #include "easylic.hpp"
 
+using namespace::Handy_crypto;
+
 namespace EasyLic{
     
     #include "private_key.h"
