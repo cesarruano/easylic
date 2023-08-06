@@ -6,6 +6,7 @@ With easylic, you can define a customized set of licensing requirements. Choose 
 - Bind to a specific machine UUID (optional)
 - Set an expiration time for the license (optional)
 - Associate with a provided license ID file (optional)
+- Feature descriptor, to customize available features in the application (optional)
 
 Generate activation files which are cryptographically signed. The details related to the license will remain concealed.
 
