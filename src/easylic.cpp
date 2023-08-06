@@ -29,6 +29,7 @@
 #include <iostream>
 #include <algorithm>
 #include <windows.h>
+#include <ctime>
 
 #include "handy_crypto.hpp"
 #include "easylic.hpp"
@@ -37,10 +38,14 @@ using namespace::Handy_crypto;
 
 namespace EasyLic{
     
-    #include "private_key.h"
-    #include "public_key.h"
     #include "aes_key.h"
+    #include "public_key.h"
     
+#ifdef EASYLIC_PRIVATE
+    #include "private_key.h"
+#else
+    const std::string private_key = "";
+#endif    
     std::string execute_cmd(const std::string& cmd) {
         std::string result;
         char buffer[128];
@@ -203,31 +208,39 @@ namespace EasyLic{
             return nullptr; // Not found, return null
         }
     }
-
+    
+    std::string print_date_from_epoch(time_t epoch) {
+        struct tm* localTime = localtime(&epoch);
+        char buffer[80];
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d", localTime);
+        return std::string(buffer);
+    }
+    
     bool validate_csv_license(const std::string& csv_data, License_activation_requirements & lar){
         std::vector<Attribute> attributes = generate_attributes_from_csv(csv_data);
         
         bool valid = true;
         
-        if(lar.needs_machine_uuid){
-           Attribute * attribute_pt = find_attribute(attributes, "uuid");
-           std::cout << attribute_pt->value << std::endl;
-           if ((attribute_pt == NULL) || (attribute_pt->value != get_uuid())){
+        if(lar.needs_license_id){
+           Attribute * attribute_pt = find_attribute(attributes, "license_id");
+           std::cout << "License ID: " << attribute_pt->value << std::endl;
+           if ((attribute_pt == NULL) || (attribute_pt->value != *lar.license_id)){
                valid = false;
            }
         }
         
-        if(lar.needs_license_id){
-           Attribute * attribute_pt = find_attribute(attributes, "license_id");
-           std::cout << attribute_pt->value << std::endl;
-           if ((attribute_pt == NULL) || (attribute_pt->value != *lar.license_id)){
+        if(lar.needs_machine_uuid){
+           Attribute * attribute_pt = find_attribute(attributes, "uuid");
+           std::cout << "Machine UUID: " << attribute_pt->value << std::endl;
+           if ((attribute_pt == NULL) || (attribute_pt->value != get_uuid())){
                valid = false;
            }
         }
         
         if(lar.expires){
            Attribute * attribute_pt = find_attribute(attributes, "expiration");
-           std::cout << attribute_pt->value << std::endl;
+           long long int lic_epoch = parse_string_to_int(attribute_pt->value);
+           std::cout << "Valid until:" << print_date_from_epoch((time_t)lic_epoch) <<std::endl;
            if ((attribute_pt == NULL) || (parse_string_to_int(attribute_pt->value) <= parse_string_to_int(get_current_time_in_seconds()))){
                valid = false;
            }
@@ -236,7 +249,7 @@ namespace EasyLic{
         return valid;
     }
 
-
+#ifdef EASYLIC_PRIVATE
     void generate_activation_file(long int * expiration_pt, std::string * uuid_pt, std::string * license_id_pt, std::string path_to_create){
         std::string csv_data = generate_validation_csv(expiration_pt, uuid_pt, license_id_pt);
         std::vector<unsigned char> signature = sign(private_key, csv_data);
@@ -246,7 +259,7 @@ namespace EasyLic{
                                          aes_encryption_key, 
                                          aes_encryption_iv);
     }
-
+#endif
     bool validate_activation_file(std::string license_id,  License_activation_requirements & lar, std::string path_to_activation){
         std::string csv_data;
         std::vector<unsigned char> read_signature;
