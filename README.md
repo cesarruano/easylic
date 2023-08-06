@@ -13,3 +13,6 @@ Verify the provided activation files. Decrypt them and authenticate their signat
 
 ## Usage
 You would typically compile an activator application to sign the data and encapsulate it in an AES encrypted file. Subsequently, compile your primary application using the verification API. In the example found under `/test`, both these operations are performed: an activation file is created and then verified. Ensure you use the `EASYLIC_PRIVATE` define when compiling the activator; if omitted, all private key handling will be excluded from the compilation.
+
+## Dependencies
+This library is based on [`handy_crypto`](https://github.com/cesarruano/handy_crypto), which uses openSSL.
