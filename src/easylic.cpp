@@ -223,7 +223,9 @@ namespace EasyLic{
         
         if(lar.needs_license_id){
            Attribute * attribute_pt = find_attribute(attributes, "license_id");
+#ifdef EASYLIC_PRIVATE
            std::cout << "License ID: " << attribute_pt->value << std::endl;
+#endif
            if ((attribute_pt == NULL) || (attribute_pt->value != *lar.license_id)){
                valid = false;
            }
@@ -231,16 +233,20 @@ namespace EasyLic{
         
         if(lar.needs_machine_uuid){
            Attribute * attribute_pt = find_attribute(attributes, "uuid");
+#ifdef EASYLIC_PRIVATE
            std::cout << "Machine UUID: " << attribute_pt->value << std::endl;
-           if ((attribute_pt == NULL) || (attribute_pt->value != get_uuid())){
+#endif
+           if ((attribute_pt == NULL) || ((attribute_pt->value != "")&&(attribute_pt->value != get_uuid())) ){
                valid = false;
            }
         }
         
         if(lar.expires){
            Attribute * attribute_pt = find_attribute(attributes, "expiration");
+#ifdef EASYLIC_PRIVATE
            long long int lic_epoch = parse_string_to_int(attribute_pt->value);
            std::cout << "Valid until:" << print_date_from_epoch((time_t)lic_epoch) <<std::endl;
+#endif
            if ((attribute_pt == NULL) || (parse_string_to_int(attribute_pt->value) <= parse_string_to_int(get_current_time_in_seconds()))){
                valid = false;
            }
